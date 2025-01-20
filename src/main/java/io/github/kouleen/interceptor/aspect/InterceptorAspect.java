@@ -1,6 +1,7 @@
 package io.github.kouleen.interceptor.aspect;
 
-import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -20,6 +21,8 @@ public class InterceptorAspect {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
+    private final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
     @Around("@annotation(io.github.kouleen.interceptor.annotations.InterceptorLog)")
     public Object interceptorAround(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         Object proceed = null;
@@ -27,9 +30,9 @@ public class InterceptorAspect {
         if(signature instanceof MethodSignature methodSignature){
             Method method = methodSignature.getMethod();
             Object[] requestBodyArgs = proceedingJoinPoint.getArgs();
-            log.info("InterceptorAspect methodName={},request={}",method.getName(), JSON.toJSONString(requestBodyArgs));
+            log.info("InterceptorAspect methodName={},request={}",method.getName(), gson.toJson(requestBodyArgs));
             proceed = proceedingJoinPoint.proceed();
-            log.info("InterceptorAspect methodName={},response={}",method.getName(), JSON.toJSONString(proceed));
+            log.info("InterceptorAspect methodName={},response={}",method.getName(), gson.toJson(proceed));
         }
         return proceed;
     }
